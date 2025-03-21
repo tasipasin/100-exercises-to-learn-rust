@@ -11,26 +11,44 @@ pub struct Ticket {
 
 impl Ticket {
     pub fn new(title: String, description: String, status: String) -> Ticket {
-        if title.is_empty() {
-            panic!("Title cannot be empty");
-        }
-        if title.len() > 50 {
-            panic!("Title cannot be longer than 50 bytes");
-        }
-        if description.is_empty() {
-            panic!("Description cannot be empty");
-        }
-        if description.len() > 500 {
-            panic!("Description cannot be longer than 500 bytes");
-        }
-        if status != "To-Do" && status != "In Progress" && status != "Done" {
-            panic!("Only `To-Do`, `In Progress`, and `Done` statuses are allowed");
-        }
-
+        Ticket::validate_title(&title);
+        Ticket::validate_status(&status);
+        Ticket::validate_description(&description);
         Ticket {
             title,
             description,
             status,
+        }
+    }
+
+    // Used the same validation implemented previously at section 02_validation
+
+    fn validate_status(status: &String) {
+        let possible_statuses = vec!["To-Do", "In Progress", "Done"];
+        if !possible_statuses.contains(&status.trim()) {
+            panic!("Only `To-Do`, `In Progress`, and `Done` statuses are allowed");
+        }
+    }
+
+    fn validate_title(value: &String) {
+        Ticket::validate_not_empty(value, "Title");
+        Ticket::validate_max_size(value, 50, "Title");
+    }
+
+    fn validate_description(value: &String) {
+        Ticket::validate_not_empty(value, "Description");
+        Ticket::validate_max_size(value, 500, "Description");
+    }
+
+    fn validate_not_empty(value: &String, field: &str) {
+        if value.is_empty() {
+            panic!("{} cannot be empty", field);
+        }
+    }
+
+    fn validate_max_size(value: &String, max_size: usize, field: &str) {
+        if value.len() > max_size {
+            panic!("{} cannot be longer than {} bytes", field, max_size);
         }
     }
 
@@ -44,6 +62,21 @@ impl Ticket {
 
     pub fn status(&self) -> &String {
         &self.status
+    }
+
+    pub fn set_status(&mut self, value: String) {
+        Ticket::validate_status(&value);
+        self.status = value;
+    }
+
+    pub fn set_description(&mut self, value: String) {
+        Ticket::validate_description(&value);
+        self.description = value;
+    }
+
+    pub fn set_title(&mut self, value: String) {
+        Ticket::validate_title(&value);
+        self.title = value;
     }
 }
 

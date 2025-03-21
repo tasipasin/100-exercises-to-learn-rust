@@ -1,3 +1,5 @@
+use core::panic;
+
 struct Ticket {
     title: String,
     description: String,
@@ -18,11 +20,42 @@ impl Ticket {
     // as well as some `String` methods. Use the documentation of Rust's standard library
     // to find the most appropriate options -> https://doc.rust-lang.org/std/string/struct.String.html
     fn new(title: String, description: String, status: String) -> Self {
-        todo!();
+        Ticket::validate_title(&title);
+        Ticket::validate_status(&status);
+        Ticket::validate_description(&description);
         Self {
             title,
             description,
             status,
+        }
+    }
+
+    fn validate_status(status: &String) {
+        let possible_statuses = vec!["To-Do", "In Progress", "Done"];
+        if !possible_statuses.contains(&status.trim()) {
+            panic!("Only `To-Do`, `In Progress`, and `Done` statuses are allowed");
+        }
+    }
+
+    fn validate_title(value: &String) {
+        Ticket::validate_not_empty(value, "Title");
+        Ticket::validate_max_size(value, 50, "Title");
+    }
+
+    fn validate_description(value: &String) {
+        Ticket::validate_not_empty(value, "Description");
+        Ticket::validate_max_size(value, 500, "Description");
+    }
+
+    fn validate_not_empty(value: &String, field: &str) {
+        if value.is_empty() {
+            panic!("{} cannot be empty", field);
+        }
+    }
+
+    fn validate_max_size(value: &String, max_size: usize, field: &str) {
+        if value.len() > max_size {
+            panic!("{} cannot be longer than {} bytes", field, max_size);
         }
     }
 }
